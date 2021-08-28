@@ -1,0 +1,54 @@
+1. Make sure you have already installed his old voice mod
+https://www.deviantart.com/caladbro/art/Tekken-4-6-voice-for-Heihachi-updated-790454018
+
+2. Run the game and then run the script, and let it run in the background. Totally upto you which one you run first the game or the script.
+
+3. Do not change anything in "voiceclips_data.txt" files, the program uses that to determine what voiceclip to change into which.
+
+/////////////////////////////////////////////////////////
+0 = hii
+1 = khiyaa
+2 = khiyaa
+3 = hmphh
+4 = hah
+5 = yaah
+6 = suryaa
+7 = khaouuu
+8 = seeeah
+9 = haa-daa
+10 = hashish
+11 = laugh
+12 = silent
+13 = haa-daa
+/////////////////////////////////////////////////////////
+VOICE CHANGELOG
+MOVE ID | MOVE NAME | NEW VOICE VALUE | WHAT GOT CHANGED IN WHAT MOVE
+1481 He_hadoh03H 6 [Iron Hand: Change last voiceclip extraprop to 6 'Suryah']
+1572 He_rprp01 4 [Demon Backhand Spin (2,2) last hit: Disable last voiceclip + Change extraprop voice clip to 4]
+1580 He_SHINJYUK3 0 [Demon Lair (1,b2,4) last hit: Change last voiceclip extraprop to 0x0 (or disable property)]
+1582 He_rprp00 -1 [Demon Slayer (1,2,2) last hit: Disable last voiceclip]
+1587 He_s_rplp 6 [Kidney Smasher (SS+2,1) last hit: Change last voiceclip to 6]
+1592 He_lk00 4 [Monzenbarai (3,4) 1st hit: Change last voiceclip to 4]
+1593 He_lkrk00 4 [Monzenbarai (3,4) 2nd hit: Change last voiceclip to 4 + Change 1st voice extraprop to 999 to disable it]
+1594 He_rk00 4 [Roundhouse Kick (n4): Change last voiceclip to 4]
+1628 He_yamazuki 3 [Twin Hammer (b12): Change last voiceclip to 3]
+1634 He_44LRP 3 [Diety Slayer (b,B12): Change last voiceclip to 3]
+1635 He_lk01B 4 [Hooking Crescent Kick (b3,3) 1st hit: Change last voiceclip to 4]
+1637 He_lk02B 4 [Hooking Crescent Kick (b3,3) 2nd hit: Change last voiceclip to 4]
+1638 He_rk00B 4 [Shingetsusen (b4): Change last voiceclip to 4]
+1639 He_s_tlp00 8 [Quick Iron Fist (ws1): Disable last voiceclip] (Or change it to 8)
+1641 He_s_trp00 8 [Dark Thrust (ws2): Change last voiceclip to 8 + disable last voiceclip extraprop]
+1671 He_s_lprk 8 [Change last voiceclip to 8]
+1689 He_t_slk00 6 [Jichinsai (d3): Change 1st voiceclip extraprop to 6]
+1691 He_dwki 4 [Geta Stomp (d4 on downed opp.): Change last voiceclip to 4]
+1704 He_dslp 6 [Thunder God Fist (f,n,d,df1): Change voiceclip to 6]
+1710 He_sjk02 6 [Jumping Mid Kick (f,n,d,df3): Change 1st voiceclip extraprop to 6]
+1756 AteN_move_1 6 [Heaven's Wrath (b14/b23): Change 1st extraprop voice to 6]
+1813 He_hp2K_2n 6 [Headbutt Carnival (f,F14) for only male opponents: Change 1st voiceclip extraprop to 6]
+2057 He_FLnage_n 10 [Neck Breaker (13): Change 2nd voiceclip extraprop to 5]
+2061 He_FRnage_n 6 [Jumping Powerbomb (24): Change 1st voiceclip extraprop to 6 + Change 3rd voiceclip extraprop to 999]
+2069 He_Bnagen 8 [Atomic Drop (backthrow): Change 1st voiceclip extraprop to 8]
+2075 He_hp2_n2 6 [Stonehead (f,F12): Change 1st voiceclip extraprop to 6]
+2079 He_wasinage_n 6 [Broken Toy (qcf13): Change 1st voiceclip extraprop to 6]
+2169 He_SUPER_0 3 [Ki-charge (1234): Change 1st voiceclip extraprop to 3]
+2171 He_sjk0S 6 [Secret Step Hell Axle (1234,d,u,uf3) 1st hit: Change last voiceclip to 6]
