@@ -239,25 +239,6 @@ bool RearrangeVoiceclips(uintptr_t moveset)
 		}
 		printf("Changing voiceclip of move: %s\n", movename.c_str());
 		
-		// Changing voiceclip
-//		if (voiceclip_val == -1)
-//		{
-//			ChangeVoiceclip(move_addr, voiceclip_val);
-//		}
-//		else if (voiceclip_val != -2)
-//		{
-//			ChangeVoiceclip(move_addr, 0x02000000 + voiceclip_val);
-//		}
-//		
-//		// Changing extraprop voiceclip
-//		if (extraprop_val != -1)
-//		{
-//			ChangeVoiceclipExtraprop(move_addr, 0x02000000 + extraprop_val, extraprop_num);
-//		}
-//		else if (extraprop_val == -2) // Disabling the entire property
-//		{
-//			ChangeVoiceclipExtraprop(move_addr, 0, extraprop_num);
-//		}
 		if (voiceclip_val != 0)
 		{
 			ChangeVoiceclip(move_addr, voiceclip_val);
