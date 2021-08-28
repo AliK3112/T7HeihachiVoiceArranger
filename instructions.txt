@@ -52,3 +52,7 @@ MOVE ID | MOVE NAME | NEW VOICE VALUE | WHAT GOT CHANGED IN WHAT MOVE
 2079 He_wasinage_n 6 [Broken Toy (qcf13): Change 1st voiceclip extraprop to 6]
 2169 He_SUPER_0 3 [Ki-charge (1234): Change 1st voiceclip extraprop to 3]
 2171 He_sjk0S 6 [Secret Step Hell Axle (1234,d,u,uf3) 1st hit: Change last voiceclip to 6]
+2280 He_lkrk00_7CS 4 [BOSS Monzenbarai (3,4) 2nd hit: Change last voiceclip to 4 + Change 1st voice extraprop to 999 to disable it]
+2281 He_rk00_7CS 4 [BOSS Roundhouse Kick (n4): Change last voiceclip to 4]
+2282 He_rk00B2_7CS 4 [BOSS Shingetsusen (b4): Change last voiceclip to 4]
+2284 He_rprp01_7CS 4 [BOSS Demon Backhand Spin (2,2) last hit: Disable last voiceclip + Change extraprop voice clip to 4]
