@@ -1,3 +1,5 @@
+#include <sstream>
+#include <limits>
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <tchar.h>
@@ -6,8 +8,19 @@
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
+#include <list>
 
 using namespace std;
+
+// Structure for storing data from the textfiles
+struct element
+{
+	string movename = "\0";
+	int move_id = 0;
+	int voiceclip_val = 0;
+	int extraprop_val = 0;
+	int extraprop_num = 0;
+};
 
 // Moveset Structure Offsets
 enum MOVESET_STRUCTURE_OFFSETS {
@@ -54,6 +67,9 @@ uintptr_t p1_struct = 0;
 uintptr_t p1_struct_size = 0;
 uintptr_t p1_moveset_offset = 0;
 
+// List that stores all data about the voiceclips
+list<element> obj;
+
 // This variable stores if the game is running or not
 bool gameRunning = true;
 
@@ -65,9 +81,6 @@ uintptr_t GetModuleBaseAddress(TCHAR* lpszModuleName, uintptr_t pID);
 
 // This function checks if the handle for the window belongs to TEKKEN 7.
 bool isTekken7(const char* ptr);
-
-// This function takes a list of offsets and size, and returns address placed on it.
-uintptr_t ReturnAddress(uintptr_t offsets[], int size);
 
 // Main function of our script
 void MainFunction();
@@ -83,9 +96,6 @@ int CheckCharacter(uintptr_t moveset);
 
 // This function fetches the address of the moveset of given side
 uintptr_t GetMovesetAddress(int side);
-
-// This function finds and returns the ID of a given move. Returns -2 on read error, -1 if move not found.
-int GetMoveID(uintptr_t moveset, const char* moveName, int start_index = 0);
 
 // This function finds and returns the address of a given move. Returns 0 on error or if move not found
 uintptr_t GetMoveAddress(uintptr_t moveset, const char* moveName, int start_index = 0);
@@ -141,6 +151,7 @@ int main()
 	std::thread t1(ThreadGameRunning);
 	MainFunction();
 	t1.join();
+	obj.~list();
 	return 0;
 }
 
@@ -173,6 +184,31 @@ void MainFunction()
 	}
 	read.close();
 	
+	// Reading data about the voicelines
+	element elm;
+	read.open("voiceclips_data.txt", ios::in);
+	if (!read.is_open())
+	{
+		cout << "Unable to open file!\n";
+		exit(1);
+	}
+	input = "\0";
+	while(getline(read, input))
+	{
+		if (input[0] == '#') continue;
+		stringstream str(input);
+		str >> elm.movename >> elm.move_id >> elm.voiceclip_val >> elm.extraprop_val >> elm.extraprop_num;
+		if (str.fail())
+		{
+			printf("Invalid entry in the text file\n");
+			str.clear();
+			str.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			continue;
+		}
+		obj.push_back(elm);
+	}
+	read.close();
+	
 	bool p1written = false;
 	bool p2written = false;
 	uintptr_t moveset1 = 0;
@@ -188,7 +224,7 @@ void MainFunction()
 			p2written = false;
 			continue;
 		}
-
+		
 		// For Player 1
 		if (!p1written && (CheckCharacter(moveset1) == 8)) p1written = RearrangeVoiceclips(moveset1);
 
@@ -199,58 +235,33 @@ void MainFunction()
 
 bool RearrangeVoiceclips(uintptr_t moveset)
 {
+	system("cls");
 	auto starting_time = std::chrono::high_resolution_clock::now();
 	int result = 1;
 	/////////////////////////////////////////////////////////////////////////////
 	// This is the portion to re-arrange voice clips
-	ifstream read;
-	read.open("voiceclips_data.txt", ios::in);
-	if(!read.is_open())
-	{
-		printf("Unable to open file: voiceclips_data.txt\nExiting Program\n");
-		Sleep(2000);
-		return false;
-	}
 	uintptr_t move_addr = 0;
-	string faltu = "\0";
-	string movename = "\0";
-	int voiceclip_val = 0;
-	int extraprop_val = 0;
-	int extraprop_num = 0;
-	while(getline(read, faltu))
-	{
-		if (faltu[0] == '#') continue;
-		else break;
-	}
-	while(!read.eof())
-	{
-		read >> movename >> voiceclip_val >> extraprop_val >> extraprop_num;
-		if (read.fail())
-		{
-			printf("Invalid data written in the text file\n");
-			Sleep(2000);
-			return false;
-		}
-		getline(read, faltu);
-		move_addr = GetMoveAddress(moveset, movename.c_str(), 1400);
-		if (move_addr == 0) {
-			printf("move: %s does not exist\n", movename.c_str());
+	list<element>::iterator it;
+    for(it = obj.begin(); it != obj.end(); ++it)
+    {
+    	move_addr = GetMoveAddress(moveset, (*it).movename.c_str(), (*it).move_id - 150);
+    	if (move_addr == 0) {
+			printf("move: %s does not exist\n", (*it).movename.c_str());
 			continue;
 		}
-		printf("Changing voiceclip of move: %s\n", movename.c_str());
+		printf("Changing voiceclip of move: %s\n", (*it).movename.c_str());
 		
-		if (voiceclip_val != 0)
+		// Changing voiceclip
+		if ((*it).voiceclip_val != 0)
 		{
-			ChangeVoiceclip(move_addr, voiceclip_val);
+			ChangeVoiceclip(move_addr, (*it).voiceclip_val);
 		}
 		
-		if (extraprop_val != -1)
+		if ((*it).extraprop_val != -1)
 		{
-			ChangeVoiceclipExtraprop(move_addr, extraprop_val, extraprop_num);
+			ChangeVoiceclipExtraprop(move_addr, (*it).extraprop_val, (*it).extraprop_num);
 		}
-	}	
-	
-	read.close();
+	}
 	
 	/////////////////////////////////////////////////////////////////////////////
 	auto stopping_time = std::chrono::high_resolution_clock::now();
@@ -263,23 +274,11 @@ bool RearrangeVoiceclips(uintptr_t moveset)
 	return false;
 }
 
-
-uintptr_t ReturnAddress(uintptr_t offsets[], int size)
-{
-	uintptr_t addr = gameBaseAddress;
-	for (int i = 0; i < size; i++)
-	{
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr + offsets[i]), &addr, sizeof(addr), NULL))
-			return 1;
-	}
-	return addr;
-}
-
 bool isMovesetLoaded(uintptr_t moveset)
 {
 	if (moveset == 0) return false;
 	int value = 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset), &value, sizeof(int), NULL)) return false;
+	ReadProcessMemory(processHandle, (LPVOID)(moveset), &value, sizeof(int), NULL);
 	if (value != 0x10000) return false;
 	return true;
 }
@@ -287,7 +286,7 @@ bool isMovesetLoaded(uintptr_t moveset)
 int CheckCharacter(uintptr_t moveset)
 {
 	short id = -1;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x14E), &id, sizeof(id), NULL)) return -1;
+	ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x14E), &id, sizeof(id), NULL);
 	return id;
 }
 
@@ -295,36 +294,17 @@ uintptr_t GetMovesetAddress(int side)
 {
 	if (side < 0 || side > 1) return 0;
 	uintptr_t moveset = 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(p1_struct + p1_moveset_offset + ((uintptr_t)side * p1_struct_size)), &moveset, sizeof(uintptr_t), NULL)) return 0;
+	ReadProcessMemory(processHandle, (LPVOID)(p1_struct + p1_moveset_offset + ((uintptr_t)side * p1_struct_size)), &moveset, sizeof(uintptr_t), NULL);
 	return moveset;
-}
-
-int GetMoveID(uintptr_t moveset, const char* moveName, int start_index)
-{
-	uintptr_t moves_addr = 0;
-	unsigned int moves_size = 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x210), &moves_addr, sizeof(uintptr_t), NULL)) return -2;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x218), &moves_size, sizeof(moves_size), NULL)) return -2;
-	uintptr_t addr = 0, moveNameAddr = 0;
-	char name[30]{ 0 };
-	for (unsigned int i = 0; i < 30; i++) name[i] = 0;
-	if (start_index < 0) start_index = 0;
-	for (unsigned int i = start_index; i < moves_size; i++)
-	{
-		addr = moves_addr + (uintptr_t)(i * 176);
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr), &moveNameAddr, sizeof(moveNameAddr), NULL)) return -2;
-		if (!ReadProcessMemory(processHandle, (LPVOID)(moveNameAddr), &name, sizeof(name), NULL)) return -2;
-		if (strcmp(name, moveName) == 0) return i;
-	}
-	return -1;
 }
 
 uintptr_t GetMoveAddress(uintptr_t moveset, const char* moveName, int start_index)
 {
 	uintptr_t moves_addr = 0;
 	unsigned int moves_size = 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x210), &moves_addr, sizeof(uintptr_t), NULL)) return 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x218), &moves_size, sizeof(moves_size), NULL)) return 0;
+	ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x210), &moves_addr, sizeof(moves_addr), NULL);
+	ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x218), &moves_size, sizeof(moves_size), NULL);
+	if (moves_addr == 0) return 0;
 	uintptr_t addr = 0, moveNameAddr = 0;
 	char name[30]{ 0 };
 	for (unsigned int i = 0; i < 30; i++) name[i] = 0;
@@ -332,8 +312,8 @@ uintptr_t GetMoveAddress(uintptr_t moveset, const char* moveName, int start_inde
 	for (unsigned int i = start_index; i < moves_size; i++)
 	{
 		addr = moves_addr + (uintptr_t)(i * 176);
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr), &moveNameAddr, sizeof(moveNameAddr), NULL)) return 0;
-		if (!ReadProcessMemory(processHandle, (LPVOID)(moveNameAddr), &name, sizeof(name), NULL)) return 0;
+		ReadProcessMemory(processHandle, (LPVOID)(addr), &moveNameAddr, sizeof(moveNameAddr), NULL);
+		ReadProcessMemory(processHandle, (LPVOID)(moveNameAddr), &name, sizeof(name), NULL);
 		if (strcmp(name, moveName) == 0) return addr;
 	}
 	return 0;
@@ -344,11 +324,11 @@ bool ChangeVoiceclip(uintptr_t move_addr, int voiceclip_val)
 	if (move_addr == 0) return false;
 	uintptr_t voiceclip_addr = 0;
 	int val = 0;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(move_addr + MoveAttributeOffsets::voiceclip_addr), &voiceclip_addr, sizeof(uintptr_t), NULL)) return 0;
+	ReadProcessMemory(processHandle, (LPVOID)(move_addr + MoveAttributeOffsets::voiceclip_addr), &voiceclip_addr, sizeof(uintptr_t), NULL);
 	if (voiceclip_addr == 0) return true;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(voiceclip_addr + 8), &val, sizeof(val), NULL)) return 0;
+	ReadProcessMemory(processHandle, (LPVOID)(voiceclip_addr + 8), &val, sizeof(val), NULL);
 	if (val == -1) return true;
-	if (!WriteProcessMemory(processHandle, (LPVOID)(voiceclip_addr + 8), &voiceclip_val, sizeof(voiceclip_val), NULL)) return 0;
+	WriteProcessMemory(processHandle, (LPVOID)(voiceclip_addr + 8), &voiceclip_val, sizeof(voiceclip_val), NULL);
 	return true;
 }
 
@@ -357,16 +337,16 @@ bool ChangeVoiceclipExtraprop(uintptr_t move_addr, int voiceclip_val, int num)
 	if (move_addr == 0) return false;
 	uintptr_t extraprop_addr = 0;
 	int starting_frame = -1, type = -1, val = -1;
-	if (!ReadProcessMemory(processHandle, (LPVOID)(move_addr + MoveAttributeOffsets::ext_prop_addr), &extraprop_addr, sizeof(uintptr_t), NULL)) return 0;
+	ReadProcessMemory(processHandle, (LPVOID)(move_addr + MoveAttributeOffsets::ext_prop_addr), &extraprop_addr, sizeof(uintptr_t), NULL);
 	if (extraprop_addr == 0) return true;
 	uintptr_t addr = extraprop_addr;
 	if (num < 1) num = 1;
 	int count = num;
 	while(1)
 	{
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr + 0), &starting_frame, sizeof(starting_frame), NULL)) return 0;
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr + 4), &type, sizeof(type), NULL)) return 0;
-		if (!ReadProcessMemory(processHandle, (LPVOID)(addr + 8), &val, sizeof(val), NULL)) return 0;
+		ReadProcessMemory(processHandle, (LPVOID)(addr + 0), &starting_frame, sizeof(starting_frame), NULL);
+		ReadProcessMemory(processHandle, (LPVOID)(addr + 4), &type, sizeof(type), NULL);
+		ReadProcessMemory(processHandle, (LPVOID)(addr + 8), &val, sizeof(val), NULL);
 		if ((starting_frame == 0) && (type == 0) && (val == 0)) {
 			break;
 		}
@@ -374,7 +354,7 @@ bool ChangeVoiceclipExtraprop(uintptr_t move_addr, int voiceclip_val, int num)
 			count--;
 		}
 		if (count == 0) {
-			if (!WriteProcessMemory(processHandle, (LPVOID)(addr + 8), &voiceclip_val, sizeof(voiceclip_val), NULL)) return 0;
+			WriteProcessMemory(processHandle, (LPVOID)(addr + 8), &voiceclip_val, sizeof(voiceclip_val), NULL);
 			break;
 		}
 		addr += 12;
