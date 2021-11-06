@@ -1,3 +1,3 @@
-# P1 Profile:0x1434E5250
-# P1 Struct Size:0x3620
-# P1 Moveset Offset:0x14D0
+P1 Profile:0x034E71D0
+P1 Struct Size:0x3670
+P1 Moveset Offset:0x1520
