@@ -1,9 +1,9 @@
 #include <sstream>
 #include <limits>
+#include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <tchar.h>
-#include <iostream>
 #include <thread>
 #include <fstream>
 #include <string.h>
@@ -294,7 +294,7 @@ uintptr_t GetMovesetAddress(int side)
 {
 	if (side < 0 || side > 1) return 0;
 	uintptr_t moveset = 0;
-	ReadProcessMemory(processHandle, (LPVOID)(p1_struct + p1_moveset_offset + ((uintptr_t)side * p1_struct_size)), &moveset, sizeof(uintptr_t), NULL);
+	ReadProcessMemory(processHandle, (LPVOID)(gameBaseAddress + p1_struct + p1_moveset_offset + ((uintptr_t)side * p1_struct_size)), &moveset, sizeof(uintptr_t), NULL);
 	return moveset;
 }
 
