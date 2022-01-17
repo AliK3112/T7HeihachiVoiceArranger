@@ -66,6 +66,7 @@ uintptr_t gameBaseAddress = 0;
 uintptr_t p1_struct = 0;
 uintptr_t p1_struct_size = 0;
 uintptr_t p1_moveset_offset = 0;
+uintptr_t target_charID = 0;
 
 // List that stores all data about the voiceclips
 list<element> obj;
@@ -93,6 +94,7 @@ bool isMovesetLoaded(uintptr_t addr);
 
 // This function checks if desired character is selected
 int CheckCharacter(uintptr_t moveset);
+int CheckCharacter(int side);
 
 // This function fetches the address of the moveset of given side
 uintptr_t GetMovesetAddress(int side);
@@ -167,10 +169,11 @@ void MainFunction()
 	}
 	string input = "\0";
 	string temp = "\0";
-	uintptr_t* ptr[3] = {&p1_struct, &p1_struct_size, &p1_moveset_offset};
+	uintptr_t* ptr[4] = {&p1_struct, &p1_struct_size, &p1_moveset_offset, &target_charID};
 	int c = 0;
 	while(getline(read, input))
 	{
+		if (input[0] == '#') continue;
 		try
 		{
 			input = input.substr(input.find("x") + 1);
@@ -208,7 +211,7 @@ void MainFunction()
 		obj.push_back(elm);
 	}
 	read.close();
-	
+	int charID = (int)target_charID;
 	bool p1written = false;
 	bool p2written = false;
 	uintptr_t moveset1 = 0;
@@ -226,10 +229,10 @@ void MainFunction()
 		}
 		
 		// For Player 1
-		if (!p1written && (CheckCharacter(moveset1) == 8)) p1written = RearrangeVoiceclips(moveset1);
+		if (!p1written && (CheckCharacter(0) == charID)) p1written = RearrangeVoiceclips(moveset1);
 
 		// For Player 2
-		if (!p2written && (CheckCharacter(moveset2) == 8)) p2written = RearrangeVoiceclips(moveset2);
+		if (!p2written && (CheckCharacter(1) == charID)) p2written = RearrangeVoiceclips(moveset2);
 	}
 }
 
@@ -287,6 +290,16 @@ int CheckCharacter(uintptr_t moveset)
 {
 	short id = -1;
 	ReadProcessMemory(processHandle, (LPVOID)(moveset + 0x14E), &id, sizeof(id), NULL);
+	return id;
+}
+
+int CheckCharacter(int side)
+{
+	if (side < 0 || side > 1)
+		return -1;
+	int id = -1;
+	uintptr_t address = gameBaseAddress + p1_struct + 0xD8;
+	ReadProcessMemory(processHandle, (LPVOID)(address + (side * p1_struct_size)), &id, sizeof(id), NULL);
 	return id;
 }
 
