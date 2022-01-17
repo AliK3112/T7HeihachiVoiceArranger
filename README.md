@@ -5,4 +5,4 @@ Last change made:
 Program now stores all data from "voiceclips_data.txt" into a list. It used to read it from the file upon every iteration.
 
 Link to old voice mod:
-https://tekkenmods.com/mod/907/heihachi-old-voice-mod-rearranger
+https://tekkenmods.com/mod/953/heihachi-t4-5-6-voicemod
