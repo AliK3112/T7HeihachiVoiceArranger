@@ -1,7 +1,7 @@
 # Syntax: Label:HexValue.
 # DO NOT CHANGE ORDER OF THIS
 # Char ID: ID of your target character in Hex value
-P1 Profile:0x034E71D0
+P1 Profile:0x034E7250
 P1 Struct Size:0x3670
 P1 Moveset Offset:0x1520
 Char ID:0x08
